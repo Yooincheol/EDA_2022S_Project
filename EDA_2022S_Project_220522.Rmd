@@ -1,0 +1,95 @@
+---
+title: "Example"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(rvest)
+library(dplyr)
+library(stringr)
+library(knitr)
+library(kableExtra)
+
+## 날짜 및 시간 설정
+now <- Sys.time()
+today <- format(Sys.time(), "%Y.%m.%d.")
+```
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Chart A (**Issued at `r now`**)
+
+```{r}
+# date.search <- "20210811"
+date.search <- format(Sys.time(), "%Y%m%d")
+URL <- str_c("https://news.nate.com/rank/interest?sc=eco&p=day&date=", date.search)
+
+res <- read_html(URL)
+pattern <- "#postRankSubject a , .tit"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+pattern <- "#newsContents > div > div.postRankSubjectList.f_clear > div > div > a"
+pattern <- "div.postRankSubjectList.f_clear > div > div > a"
+pattern <- "div.mlt01 > a"
+
+link1 <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href")
+
+pattern <- "#postRankSubject a"
+link2 <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href")
+
+link <- c(link1, link2) %>% str_c("https:", .)
+
+tab <- cbind(today, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(today, title.link)
+
+names(df) <- c("Date", "Title")
+
+df %>% head(15) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Chart B
+
+* List 1
+* List 2
+* List 3
+
+1. Item 1
+2. Item 2
+3. Item 3
+
+<br>
+
+Summary statistics for dist and speed
+```{r}
+summary(cars$dist)
+summary(cars$speed)
+```
+
+### Chart C
+
+[Playground](https://sites.google.com/view/jaesung)
+
+There were `r nrow(cars)` **cars** studied
+
+```{r}
+plot(cars)
+```
