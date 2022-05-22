@@ -1,9 +1,8 @@
 ---
-title: "Example"
+title: "경제데이터분석입문 Final_Yoo in Cheol"
 output: 
   flexdashboard::flex_dashboard:
-    orientation: columns
-    vertical_layout: fill
+    vertical_layout: scroll
 ---
 
 ```{r setup, include=FALSE}
@@ -19,36 +18,31 @@ now <- Sys.time()
 today <- format(Sys.time(), "%Y.%m.%d.")
 ```
 
+M&A 주요기사
+===================================== 
+
 Column {data-width=500}
 -----------------------------------------------------------------------
-
-### Chart A (**Issued at `r now`**)
+### 마켓인사이트 (**Issued at `r now`**)
 
 ```{r}
 # date.search <- "20210811"
 date.search <- format(Sys.time(), "%Y%m%d")
-URL <- str_c("https://news.nate.com/rank/interest?sc=eco&p=day&date=", date.search)
+URL <- "https://marketinsight.hankyung.com/freenews"
 
 res <- read_html(URL)
-pattern <- "#postRankSubject a , .tit"
+pattern <- ".news-tit a"
 title <- res %>% 
   html_nodes(pattern) %>% 
   html_text()
 
-pattern <- "#newsContents > div > div.postRankSubjectList.f_clear > div > div > a"
-pattern <- "div.postRankSubjectList.f_clear > div > div > a"
-pattern <- "div.mlt01 > a"
+pattern <- "#contents > div > div > div.cont-free > ul > li:nth-child(1) > div.txt-cont > h3 > a"
 
-link1 <- res %>% 
+link <- res %>% 
   html_nodes(pattern) %>% 
-  html_attr("href")
+  html_attr("href") %>% 
+  str_c("https:", .)
 
-pattern <- "#postRankSubject a"
-link2 <- res %>% 
-  html_nodes(pattern) %>% 
-  html_attr("href")
-
-link <- c(link1, link2) %>% str_c("https:", .)
 
 tab <- cbind(today, title, link) %>% as_tibble()
 
@@ -56,40 +50,162 @@ df <- tab %>%
   mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
   select(today, title.link)
 
-names(df) <- c("Date", "Title")
+names(df) <- c("Date", "Headline")
 
 df %>% head(15) %>%
   kable(format="html", escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
+
+-----------------------------------------------------------------------
+
+### The Bell (더벨) (**Issued at `r now`**)
+
+```{r}
+# date.search <- "20210811"
+date.search <- format(Sys.time(), "%Y%m%d")
+URL <- "https://www.thebell.co.kr/free/content/article.asp?svccode=01"
+
+res <- read_html(URL)
+pattern <- ".listBox dt"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+pattern <- "#contents > div.contentSection > div > div.newsBox > div.newsList > div.listBox > ul > li > dl > a"
+
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href") %>% 
+  str_c("https://www.thebell.co.kr/free/content/", .)
+
+tab <- cbind(today, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(today, title.link)
+
+names(df) <- c("Date", "Headline")
+
+df %>% head(10) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+
+### 인베스트조선 (**Issued at `r now`**)
+
+```{r}
+# date.search <- "20210811"
+date.search <- format(Sys.time(), "%Y%m%d")
+URL <- "https://www.investchosun.com/svc/news/list.html?catid=2"
+
+res <- read_html(URL)
+pattern <- "dt a"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+pattern <- "body > div > div > ul > li > div > dl > dd.summary > a"
+
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href") %>% 
+  str_c("https://www.investchosun.com/", .)
+
+tab <- cbind(today, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(today, title.link)
+
+names(df) <- c("Date", "Headline")
+
+df %>% head(15) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+
 Column {data-width=500}
 -----------------------------------------------------------------------
 
-### Chart B
+### 매일경제 M&A (**Issued at `r now`**)
 
-* List 1
-* List 2
-* List 3
-
-1. Item 1
-2. Item 2
-3. Item 3
-
-<br>
-
-Summary statistics for dist and speed
 ```{r}
-summary(cars$dist)
-summary(cars$speed)
+# date.search <- "20210811"
+date.search <- format(Sys.time(), "%Y%m%d")
+URL <- "https://www.mk.co.kr/news/list_kword.php?kword=M%26A"
+
+res <- read_html(URL)
+pattern <- "#container_left .tit a"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+pattern <- "#container_left > dl > dt > a"
+
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href")
+
+tab <- cbind(today, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(today, title.link)
+
+names(df) <- c("Date", "Headline")
+
+df %>% head(20) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
-### Chart C
 
-[Playground](https://sites.google.com/view/jaesung)
-
-There were `r nrow(cars)` **cars** studied
+### 팍스넷 PEF (**Issued at `r now`**)
 
 ```{r}
-plot(cars)
+# date.search <- "20210811"
+date.search <- format(Sys.time(), "%Y%m%d")
+URL <- "https://paxnetnews.com/categories/075033"
+
+res <- read_html(URL)
+pattern <- ".ss-news-top-title"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+pattern <- "body > div.contents.small-top > div > div.content-main > div.mnm-news-list > div> div > a"
+
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href") %>% 
+  str_c("https://paxnetnews.com", .)
+
+tab <- cbind(today, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(today, title.link)
+
+names(df) <- c("Date", "Headline")
+
+df %>% head(20) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+Page2
+===================================== 
+
+### Chart 1
+    
+```{r}
+```
+    
+### Chart 2
+
+```{r}
 ```
