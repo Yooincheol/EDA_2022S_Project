@@ -2,7 +2,8 @@
 title: "경제데이터분석입문 Final_Yoo in Cheol"
 output: 
   flexdashboard::flex_dashboard:
-    vertical_layout: scroll
+  orientation: columns
+vertical_layout: fill
 ---
 
 ```{r setup, include=FALSE}
@@ -12,13 +13,15 @@ library(dplyr)
 library(stringr)
 library(knitr)
 library(kableExtra)
+library(RSelenium)
+
 
 ## 날짜 및 시간 설정
 now <- Sys.time()
 today <- format(Sys.time(), "%Y.%m.%d.")
 ```
 
-M&A 주요기사
+M&A 주요기사 {data-icon="fa-list"} 
 ===================================== 
 
 Column {data-width=500}
@@ -197,15 +200,65 @@ df %>% head(20) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
-Page2
-===================================== 
+IR 자료{data-icon="fa-hashtag"}
+=====================================
 
-### Chart 1
+Row {data-height=500}
+-------------------------------------
+
+### 한국거래소 IR (**Issued at `r now`**)
+
+```{r}
+date.search <- format(Sys.time(), "%Y%m%d")
+URL <- "https://kind.krx.co.kr/corpgeneral/irschedule.do?method=searchIRScheduleMain&gubun=iRMaterials"
+
+res <- read_html(URL)
+pattern <- "#main-contents .vmiddle+ a"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+res <- read_html(URL)
+pattern <- ".first.txc"
+number <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+res <- read_html(URL)
+pattern <- ".txc:nth-child(3)"
+date <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+pattern <- "#main-contents > section.scrarea.type-00 > table > tbody > tr.first > td > a"
+
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href")
+
+tab <- cbind(today, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(today, title.link)
+
+names(df) <- c("Date", "Headline")
+
+df %>% head(20) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+```
+
+### 코스닥협회 IR (**Issued at `r now`**)
     
 ```{r}
 ```
     
-### Chart 2
+Row {data-height=500}
+-------------------------------------
+    
+### Dart 공시 (**Issued at `r now`**)
 
 ```{r}
 ```
