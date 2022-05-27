@@ -26,7 +26,94 @@ M&A 주요기사 {data-icon="fa-list"}
 
 Column {data-width=500}
 -----------------------------------------------------------------------
-### 마켓인사이트 (**Issued at `r now`**)
+<< PEF 사설>>
+
+### PEF 썰전 (**`r now`**)
+
+```{r}
+# date.search <- "20210811"
+date.search <- format(Sys.time(), "%Y%m%d")
+URL <- "https://www.hankyung.com/tag/PEF%EC%8D%B0%EC%A0%84"
+
+res <- read_html(URL)
+pattern <- ".txt a"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+pattern <- ".time"
+date <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() 
+
+pub.date <- str_sub(date, 1, 10)
+
+pattern <- "#container > div.contents_wrap > div.contents > div.news_list_wrap > ul:nth-child(1) > li > div.txt > h3 > a"
+
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href")
+
+tab <- cbind(pub.date, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(pub.date, title.link)
+
+names(df) <- c("Date", "Headline")
+
+df %>% head(length(title)) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+### PEF 밸류업 사례탐구 (**`r now`**)
+
+```{r}
+# date.search <- "20210811"
+date.search <- format(Sys.time(), "%Y%m%d")
+URL <- "https://www.hankyung.com/tag/PEF-%EB%B0%B8%EB%A5%98%EC%97%85-%EC%82%AC%EB%A1%80%ED%83%90%EA%B5%AC"
+
+res <- read_html(URL)
+pattern <- ".txt a"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+pattern <- ".time"
+date <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() 
+
+pub.date <- str_sub(date, 1, 10)
+
+pattern <- "#container > div.contents_wrap > div.contents > div.news_list_wrap > ul > li > div.txt > h3 > a"
+
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href")
+
+tab <- cbind(pub.date, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(pub.date, title.link)
+
+names(df) <- c("Date", "Headline")
+
+df %>% head(15) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+
+```
+
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+<< M&A 주요 뉴스 >>
+
+### 마켓인사이트 (**`r now`**)
 
 ```{r}
 # date.search <- "20210811"
@@ -39,7 +126,16 @@ title <- res %>%
   html_nodes(pattern) %>% 
   html_text()
 
-pattern <- "#contents > div > div > div.cont-free > ul > li:nth-child(1) > div.txt-cont > h3 > a"
+pattern <- "#contents > div > div > div.cont-free > ul > li > div.txt-cont > h3 > a"
+
+date <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href")
+
+pub.date <- str_c(str_sub(date, 38, 41), ".", str_sub(date, 42, 43), ".", str_sub(date, 44, 45))
+
+
+pattern <- "#contents > div > div > div.cont-free > ul > li > div.txt-cont > h3 > a"
 
 link <- res %>% 
   html_nodes(pattern) %>% 
@@ -47,11 +143,11 @@ link <- res %>%
   str_c("https:", .)
 
 
-tab <- cbind(today, title, link) %>% as_tibble()
+tab <- cbind(pub.date, title, link) %>% as_tibble()
 
 df <- tab %>%
   mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
-  select(today, title.link)
+  select(pub.date, title.link)
 
 names(df) <- c("Date", "Headline")
 
@@ -63,7 +159,7 @@ df %>% head(15) %>%
 
 -----------------------------------------------------------------------
 
-### The Bell (더벨) (**Issued at `r now`**)
+### The Bell (더벨) (**`r now`**)
 
 ```{r}
 # date.search <- "20210811"
@@ -76,6 +172,13 @@ title <- res %>%
   html_nodes(pattern) %>% 
   html_text()
 
+pattern <- ".date"
+date <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() 
+
+pub.date <- str_c(str_sub(date, 1, 4), ".", str_sub(date, 6, 7), ".", str_sub(date, 9, 10))
+
 pattern <- "#contents > div.contentSection > div > div.newsBox > div.newsList > div.listBox > ul > li > dl > a"
 
 link <- res %>% 
@@ -83,11 +186,11 @@ link <- res %>%
   html_attr("href") %>% 
   str_c("https://www.thebell.co.kr/free/content/", .)
 
-tab <- cbind(today, title, link) %>% as_tibble()
+tab <- cbind(pub.date, title, link) %>% as_tibble()
 
 df <- tab %>%
   mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
-  select(today, title.link)
+  select(pub.date, title.link)
 
 names(df) <- c("Date", "Headline")
 
@@ -96,8 +199,7 @@ df %>% head(10) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
-
-### 인베스트조선 (**Issued at `r now`**)
+### 인베스트조선 (**`r now`**)
 
 ```{r}
 # date.search <- "20210811"
@@ -110,6 +212,11 @@ title <- res %>%
   html_nodes(pattern) %>% 
   html_text()
 
+pattern <- ".date span:nth-child(1)"
+pub.date <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() 
+
 pattern <- "body > div > div > ul > li > div > dl > dd.summary > a"
 
 link <- res %>% 
@@ -117,11 +224,11 @@ link <- res %>%
   html_attr("href") %>% 
   str_c("https://www.investchosun.com/", .)
 
-tab <- cbind(today, title, link) %>% as_tibble()
+tab <- cbind(pub.date, title, link) %>% as_tibble()
 
 df <- tab %>%
   mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
-  select(today, title.link)
+  select(pub.date, title.link)
 
 names(df) <- c("Date", "Headline")
 
@@ -130,130 +237,26 @@ df %>% head(15) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
-
-Column {data-width=500}
------------------------------------------------------------------------
-
-### 매일경제 M&A (**Issued at `r now`**)
-
-```{r}
-# date.search <- "20210811"
-date.search <- format(Sys.time(), "%Y%m%d")
-URL <- "https://www.mk.co.kr/news/list_kword.php?kword=M%26A"
-
-res <- read_html(URL)
-pattern <- "#container_left .tit a"
-title <- res %>% 
-  html_nodes(pattern) %>% 
-  html_text()
-
-pattern <- "#container_left > dl > dt > a"
-
-link <- res %>% 
-  html_nodes(pattern) %>% 
-  html_attr("href")
-
-tab <- cbind(today, title, link) %>% as_tibble()
-
-df <- tab %>%
-  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
-  select(today, title.link)
-
-names(df) <- c("Date", "Headline")
-
-df %>% head(20) %>%
-  kable(format="html", escape=FALSE) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-```
-
-
-### 팍스넷 PEF (**Issued at `r now`**)
-
-```{r}
-# date.search <- "20210811"
-date.search <- format(Sys.time(), "%Y%m%d")
-URL <- "https://paxnetnews.com/categories/075033"
-
-res <- read_html(URL)
-pattern <- ".ss-news-top-title"
-title <- res %>% 
-  html_nodes(pattern) %>% 
-  html_text()
-
-pattern <- "body > div.contents.small-top > div > div.content-main > div.mnm-news-list > div> div > a"
-
-link <- res %>% 
-  html_nodes(pattern) %>% 
-  html_attr("href") %>% 
-  str_c("https://paxnetnews.com", .)
-
-tab <- cbind(today, title, link) %>% as_tibble()
-
-df <- tab %>%
-  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
-  select(today, title.link)
-
-names(df) <- c("Date", "Headline")
-
-df %>% head(20) %>%
-  kable(format="html", escape=FALSE) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-```
-
-IR 자료{data-icon="fa-hashtag"}
+채용공고{data-icon="fa-hashtag"}
 =====================================
 
 Row {data-height=500}
 -------------------------------------
 
-### 한국거래소 IR (**Issued at `r now`**)
-
-```{r}
-date.search <- format(Sys.time(), "%Y%m%d")
-URL <- "https://kind.krx.co.kr/corpgeneral/irschedule.do?method=searchIRScheduleMain&gubun=iRMaterials"
-
-res <- read_html(URL)
-pattern <- "#main-contents .vmiddle+ a"
-title <- res %>% 
-  html_nodes(pattern) %>% 
-  html_text()
-
-res <- read_html(URL)
-pattern <- ".first.txc"
-number <- res %>% 
-  html_nodes(pattern) %>% 
-  html_text()
-
-res <- read_html(URL)
-pattern <- ".txc:nth-child(3)"
-date <- res %>% 
-  html_nodes(pattern) %>% 
-  html_text()
-
-pattern <- "#main-contents > section.scrarea.type-00 > table > tbody > tr.first > td > a"
-
-link <- res %>% 
-  html_nodes(pattern) %>% 
-  html_attr("href")
-
-tab <- cbind(today, title, link) %>% as_tibble()
-
-df <- tab %>%
-  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
-  select(today, title.link)
-
-names(df) <- c("Date", "Headline")
-
-df %>% head(20) %>%
-  kable(format="html", escape=FALSE) %>%
-  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-
-```
-
-### 코스닥협회 IR (**Issued at `r now`**)
+### 일반기업 (**`r now`**)
     
 ```{r}
+
+
+
 ```
+
+### 삼정회계법인 (**`r now`**)
+```{r}
+
+
+```
+
     
 Row {data-height=500}
 -------------------------------------
@@ -261,4 +264,43 @@ Row {data-height=500}
 ### Dart 공시 (**Issued at `r now`**)
 
 ```{r}
+```
+
+### 삼일회계법인 채용공고 (**`r now`**)
+    
+```{r}
+
+URL <- "https://www.pwc.com/kr/ko/career/experienced.html"
+
+res <- read_html(URL)
+
+pattern <- "td:nth-child(1) a"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+pattern <- "tr+ tr td:nth-child(2)"
+service <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() 
+
+pattern <- "#content-free-1-920b > div > div.table.text.parbase.striped.section > div > table > tbody > tr > td:nth-child(1) > a"
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href") %>% 
+  str_c("https://www.pwc.com",.)
+
+tab <- cbind(service, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(service, title.link)
+
+names(df) <- c("Service", "Job title")
+
+df %>% head(20) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+
 ```
