@@ -1,0 +1,305 @@
+---
+title: "경제데이터분석입문 Final_Yoo in Cheol"
+output: 
+  flexdashboard::flex_dashboard:
+  orientation: columns
+vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(rvest)
+library(dplyr)
+library(stringr)
+library(knitr)
+library(kableExtra)
+library(RSelenium)
+
+
+## 날짜 및 시간 설정
+now <- Sys.time()
+today <- format(Sys.time(), "%Y.%m.%d.")
+```
+
+M&A 주요기사 {data-icon="fa-list"} 
+===================================== 
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+<< PEF 사설>>
+
+### PEF 썰전 (**`r now`**)
+
+```{r}
+# date.search <- "20210811"
+date.search <- format(Sys.time(), "%Y%m%d")
+URL <- "https://www.hankyung.com/tag/PEF%EC%8D%B0%EC%A0%84"
+
+res <- read_html(URL)
+pattern <- ".txt a"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+pattern <- ".time"
+date <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() 
+
+pub.date <- str_sub(date, 1, 10)
+
+pattern <- "#container > div.contents_wrap > div.contents > div.news_list_wrap > ul:nth-child(1) > li > div.txt > h3 > a"
+
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href")
+
+tab <- cbind(pub.date, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(pub.date, title.link)
+
+names(df) <- c("Date", "Headline")
+
+df %>% head(length(title)) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+### PEF 밸류업 사례탐구 (**`r now`**)
+
+```{r}
+# date.search <- "20210811"
+date.search <- format(Sys.time(), "%Y%m%d")
+URL <- "https://www.hankyung.com/tag/PEF-%EB%B0%B8%EB%A5%98%EC%97%85-%EC%82%AC%EB%A1%80%ED%83%90%EA%B5%AC"
+
+res <- read_html(URL)
+pattern <- ".txt a"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+pattern <- ".time"
+date <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() 
+
+pub.date <- str_sub(date, 1, 10)
+
+pattern <- "#container > div.contents_wrap > div.contents > div.news_list_wrap > ul > li > div.txt > h3 > a"
+
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href")
+
+tab <- cbind(pub.date, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(pub.date, title.link)
+
+names(df) <- c("Date", "Headline")
+
+df %>% head(15) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+
+```
+
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+<< M&A 주요 뉴스 >>
+
+### 마켓인사이트 (**`r now`**)
+
+```{r}
+# date.search <- "20210811"
+date.search <- format(Sys.time(), "%Y%m%d")
+URL <- "https://marketinsight.hankyung.com/freenews"
+
+res <- read_html(URL)
+pattern <- ".news-tit a"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+pattern <- "#contents > div > div > div.cont-free > ul > li > div.txt-cont > h3 > a"
+
+date <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href")
+
+pub.date <- str_c(str_sub(date, 38, 41), ".", str_sub(date, 42, 43), ".", str_sub(date, 44, 45))
+
+
+pattern <- "#contents > div > div > div.cont-free > ul > li > div.txt-cont > h3 > a"
+
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href") %>% 
+  str_c("https:", .)
+
+
+tab <- cbind(pub.date, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(pub.date, title.link)
+
+names(df) <- c("Date", "Headline")
+
+df %>% head(15) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+
+-----------------------------------------------------------------------
+
+### The Bell (더벨) (**`r now`**)
+
+```{r}
+# date.search <- "20210811"
+date.search <- format(Sys.time(), "%Y%m%d")
+URL <- "https://www.thebell.co.kr/free/content/article.asp?svccode=01"
+
+res <- read_html(URL)
+pattern <- ".listBox dt"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+pattern <- ".date"
+date <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() 
+
+pub.date <- str_c(str_sub(date, 1, 4), ".", str_sub(date, 6, 7), ".", str_sub(date, 9, 10))
+
+pattern <- "#contents > div.contentSection > div > div.newsBox > div.newsList > div.listBox > ul > li > dl > a"
+
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href") %>% 
+  str_c("https://www.thebell.co.kr/free/content/", .)
+
+tab <- cbind(pub.date, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(pub.date, title.link)
+
+names(df) <- c("Date", "Headline")
+
+df %>% head(10) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+### 인베스트조선 (**`r now`**)
+
+```{r}
+# date.search <- "20210811"
+date.search <- format(Sys.time(), "%Y%m%d")
+URL <- "https://www.investchosun.com/svc/news/list.html?catid=2"
+
+res <- read_html(URL)
+pattern <- "dt a"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+pattern <- ".date span:nth-child(1)"
+pub.date <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() 
+
+pattern <- "body > div > div > ul > li > div > dl > dd.summary > a"
+
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href") %>% 
+  str_c("https://www.investchosun.com/", .)
+
+tab <- cbind(pub.date, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(pub.date, title.link)
+
+names(df) <- c("Date", "Headline")
+
+df %>% head(15) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+채용공고{data-icon="fa-hashtag"}
+=====================================
+
+Row {data-height=500}
+-------------------------------------
+
+### 일반기업 (**`r now`**)
+    
+```{r}
+
+
+```
+
+### 삼정회계법인 (**`r now`**)
+```{r}
+
+
+```
+
+    
+Row {data-height=500}
+-------------------------------------
+    
+### Dart 공시 (**Issued at `r now`**)
+
+```{r}
+```
+
+### 삼일회계법인 채용공고 (**`r now`**)
+    
+```{r}
+
+URL <- "https://www.pwc.com/kr/ko/career/experienced.html"
+
+res <- read_html(URL)
+
+pattern <- "td:nth-child(1) a"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+pattern <- "tr+ tr td:nth-child(2)"
+service <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() 
+
+pattern <- "#content-free-1-920b > div > div.table.text.parbase.striped.section > div > table > tbody > tr > td:nth-child(1) > a"
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href") %>% 
+  str_c("https://www.pwc.com",.)
+
+tab <- cbind(service, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(service, title.link)
+
+names(df) <- c("Service", "Job title")
+
+df %>% head(20) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+
+```
