@@ -15,6 +15,8 @@ library(knitr)
 library(kableExtra)
 library(RSelenium)
 
+rD <- rsDriver(port=4775L, "firefox")
+remDr <- rD$client
 
 ## 날짜 및 시간 설정
 now <- Sys.time()
@@ -33,26 +35,83 @@ Column {data-width=500}
 ```{r}
 # date.search <- "20210811"
 date.search <- format(Sys.time(), "%Y%m%d")
-URL <- "https://www.hankyung.com/tag/PEF%EC%8D%B0%EC%A0%84"
 
-res <- read_html(URL)
-pattern <- ".txt a"
+Stack <- NULL
+
+for(i in 1:10){
+  URL <- str_c("https://www.hankyung.com/tag/PEF%EC%8D%B0%EC%A0%84?page=", "i")
+  
+  res <- read_html(URL)
+  pattern <- ".txt a"
+  title <- res %>%
+    html_nodes(pattern) %>%
+    html_text()
+  
+  pattern <- ".time"
+  date <- res %>%
+    html_nodes(pattern) %>%
+    html_text()
+  
+  pub.date <- str_sub(date, 1, 10)
+  
+  pattern <-
+    "#container > div.contents_wrap > div.contents > div.news_list_wrap > ul:nth-child(1) > li > div.txt > h3 > a"
+  
+  link <- res %>%
+    html_nodes(pattern) %>%
+    html_attr("href")
+  
+  tab <- cbind(pub.date, title, link) %>% as_tibble()
+  
+  Stack <- rbind(Stack, tab)
+  
+  Sys.sleep(2)
+}
+
+
+df <- Stack %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(pub.date, title.link)
+
+names(df) <- c("Date", "Headline")
+
+df %>% head(length(title)) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+```
+
+### 한경 CFO Insight (**`r now`**)
+
+```{r}
+date.search <- format(Sys.time(), "%Y%m%d")
+
+URL <- "https://page.stibee.com/archives/83403"
+remDr$navigate(URL)
+
+txt <- remDr$getPageSource()[[1]]
+res <- read_html(txt)
+
+frames = remDr$findElements(using = "id", value = "root")
+
+pattern <- ".title"
 title <- res %>% 
   html_nodes(pattern) %>% 
   html_text()
 
-pattern <- ".time"
+pattern <- ".date"
 date <- res %>% 
   html_nodes(pattern) %>% 
-  html_text() 
+  html_text() %>% 
+  str_trim()
 
-pub.date <- str_sub(date, 1, 10)
+pub.date <- str_sub(date, 1, 10) %>% str_trim()
 
-pattern <- "#container > div.contents_wrap > div.contents > div.news_list_wrap > ul:nth-child(1) > li > div.txt > h3 > a"
-
+pattern <- "#stb_archives > div.stb_archives_body > div > a"
 link <- res %>% 
   html_nodes(pattern) %>% 
   html_attr("href")
+
+
 
 tab <- cbind(pub.date, title, link) %>% as_tibble()
 
@@ -65,12 +124,13 @@ names(df) <- c("Date", "Headline")
 df %>% head(length(title)) %>%
   kable(format="html", escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+system("taskkill /im java.exe /F")
 ```
 
 ### PEF 밸류업 사례탐구 (**`r now`**)
 
 ```{r}
-# date.search <- "20210811"
 date.search <- format(Sys.time(), "%Y%m%d")
 URL <- "https://www.hankyung.com/tag/PEF-%EB%B0%B8%EB%A5%98%EC%97%85-%EC%82%AC%EB%A1%80%ED%83%90%EA%B5%AC"
 
@@ -101,11 +161,9 @@ df <- tab %>%
 
 names(df) <- c("Date", "Headline")
 
-df %>% head(15) %>%
+df %>% head(length(title)) %>%
   kable(format="html", escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-
-
 ```
 
 
@@ -118,40 +176,58 @@ Column {data-width=500}
 ```{r}
 # date.search <- "20210811"
 date.search <- format(Sys.time(), "%Y%m%d")
-URL <- "https://marketinsight.hankyung.com/freenews"
 
-res <- read_html(URL)
-pattern <- ".news-tit a"
-title <- res %>% 
-  html_nodes(pattern) %>% 
-  html_text()
+Stack <- NULL
 
-pattern <- "#contents > div > div > div.cont-free > ul > li > div.txt-cont > h3 > a"
+for(i in 1:5){
+  URL <-
+    str_c("https://marketinsight.hankyung.com/freenews?page=", i)
+  
+  res <- read_html(URL)
+  pattern <- ".news-tit a"
+  title <- res %>%
+    html_nodes(pattern) %>%
+    html_text()
+  
+  pattern <-
+    "#contents > div > div > div.cont-free > ul > li > div.txt-cont > h3 > a"
+  
+  date <- res %>%
+    html_nodes(pattern) %>%
+    html_attr("href")
+  
+  pub.date <-
+    str_c(str_sub(date, 38, 41),
+          ".",
+          str_sub(date, 42, 43),
+          ".",
+          str_sub(date, 44, 45))
+  
+  
+  pattern <- "#contents > div > div > div.cont-free > ul > li > div.txt-cont > h3 > a"
+  
+  link <- res %>%
+    html_nodes(pattern) %>%
+    html_attr("href") %>%
+    str_c("https:", .)
+  
+  
+  tab <- cbind(pub.date, title, link) %>% as_tibble()  
+  
+  Stack <- rbind(Stack, tab)
+  
+  Sys.sleep(1)
+  
+}
 
-date <- res %>% 
-  html_nodes(pattern) %>% 
-  html_attr("href")
 
-pub.date <- str_c(str_sub(date, 38, 41), ".", str_sub(date, 42, 43), ".", str_sub(date, 44, 45))
-
-
-pattern <- "#contents > div > div > div.cont-free > ul > li > div.txt-cont > h3 > a"
-
-link <- res %>% 
-  html_nodes(pattern) %>% 
-  html_attr("href") %>% 
-  str_c("https:", .)
-
-
-tab <- cbind(pub.date, title, link) %>% as_tibble()
-
-df <- tab %>%
+df <- Stack %>%
   mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
   select(pub.date, title.link)
 
 names(df) <- c("Date", "Headline")
 
-df %>% head(15) %>%
+df %>% head(length(title)) %>%
   kable(format="html", escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
