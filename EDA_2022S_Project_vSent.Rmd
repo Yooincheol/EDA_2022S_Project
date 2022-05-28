@@ -23,7 +23,7 @@ now <- Sys.time()
 today <- format(Sys.time(), "%Y.%m.%d.")
 ```
 
-M&A 주요기사 {data-icon="fa-list"} 
+M&A 주요기사 (아침) {data-icon="fa-list"} 
 ===================================== 
 
 Column {data-width=500}
@@ -65,7 +65,6 @@ for(i in 1:10){
   
   Stack <- rbind(Stack, tab)
   
-  Sys.sleep(2)
 }
 
 
@@ -101,8 +100,7 @@ title <- res %>%
 pattern <- ".date"
 date <- res %>% 
   html_nodes(pattern) %>% 
-  html_text() %>% 
-  str_trim()
+  html_text()
 
 pub.date <- str_sub(date, 1, 10) %>% str_trim()
 
@@ -313,7 +311,43 @@ df %>% head(15) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
-채용공고{data-icon="fa-hashtag"}
+오늘 점심 뭐먹지{data-icon="fa-hashtag"}
+=====================================
+
+Row {data-height=500}
+-------------------------------------
+
+### 일반기업 (**`r now`**)
+    
+```{r}
+
+
+```
+
+### 삼정회계법인 (**`r now`**)
+```{r}
+
+
+```
+
+    
+Row {data-height=500}
+-------------------------------------
+    
+### Dart 공시 (**Issued at `r now`**)
+
+```{r}
+```
+
+### 삼일회계법인 채용공고 (**`r now`**)
+    
+```{r}
+
+
+
+```
+
+채용공고(저녁){data-icon="fa-hashtag"}
 =====================================
 
 Row {data-height=500}
