@@ -15,7 +15,7 @@ library(knitr)
 library(kableExtra)
 library(RSelenium)
 
-rD <- rsDriver(port=4775L, "firefox")
+rD <- rsDriver(port=4998L, "firefox")
 remDr <- rD$client
 
 ## 날짜 및 시간 설정
@@ -30,7 +30,7 @@ Column {data-width=500}
 -----------------------------------------------------------------------
 << PEF 사설>>
 
-### PEF 썰전 (**`r now`**)
+### PEF 썰전 (**`r now`**) [Link](https://www.hankyung.com/tag/PEF%EC%8D%B0%EC%A0%84?page=1)
 
 ```{r}
 # date.search <- "20210811"
@@ -79,7 +79,7 @@ df %>% head(length(title)) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
-### 한경 CFO Insight (**`r now`**)
+### 한경 CFO Insight (**`r now`**) [Link](https://page.stibee.com/archives/83403)
 
 ```{r}
 date.search <- format(Sys.time(), "%Y%m%d")
@@ -95,12 +95,14 @@ frames = remDr$findElements(using = "id", value = "root")
 pattern <- ".title"
 title <- res %>% 
   html_nodes(pattern) %>% 
-  html_text()
+  html_text() %>% 
+  str_trim()
 
 pattern <- ".date"
 date <- res %>% 
   html_nodes(pattern) %>% 
-  html_text()
+  html_text() %>% 
+  str_trim()
 
 pub.date <- str_sub(date, 1, 10) %>% str_trim()
 
@@ -123,10 +125,10 @@ df %>% head(length(title)) %>%
   kable(format="html", escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
-system("taskkill /im java.exe /F")
+
 ```
 
-### PEF 밸류업 사례탐구 (**`r now`**)
+### PEF 밸류업 사례탐구 (**`r now`**) [Link](https://www.hankyung.com/tag/PEF-%EB%B0%B8%EB%A5%98%EC%97%85-%EC%82%AC%EB%A1%80%ED%83%90%EA%B5%AC)
 
 ```{r}
 date.search <- format(Sys.time(), "%Y%m%d")
@@ -169,7 +171,7 @@ Column {data-width=500}
 -----------------------------------------------------------------------
 << M&A 주요 뉴스 >>
 
-### 마켓인사이트 (**`r now`**)
+### 마켓인사이트 (**`r now`**) [Link](https://marketinsight.hankyung.com/freenews?page=1)
 
 ```{r}
 # date.search <- "20210811"
@@ -233,7 +235,7 @@ df %>% head(length(title)) %>%
 
 -----------------------------------------------------------------------
 
-### The Bell (더벨) (**`r now`**)
+### The Bell (더벨) (**`r now`**) [Link](https://www.thebell.co.kr/free/content/article.asp?svccode=01)
 
 ```{r}
 # date.search <- "20210811"
@@ -273,7 +275,7 @@ df %>% head(10) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
-### 인베스트조선 (**`r now`**)
+### 인베스트조선 (**`r now`**) [Link](https://www.investchosun.com/svc/news/list.html?catid=2)
 
 ```{r}
 # date.search <- "20210811"
@@ -352,31 +354,54 @@ Row {data-height=500}
 
 Row {data-height=500}
 -------------------------------------
+<< 채용공고 >>
 
-### 일반기업 (**`r now`**)
+### 일반기업 (**`r now`**) [Link](https://www.kicpa.or.kr/home/jobOffrSrchGnrl/list.face?ijJobSep=1&ijCoSep=4&listCnt=150&FsrhTab=4)
     
 ```{r}
+date.search <- format(Sys.time(), "%Y%m%d")
 
+URL <- "https://www.kicpa.or.kr/home/jobOffrSrchGnrl/list.face?ijJobSep=1&ijCoSep=4&listCnt=150&FsrhTab=4"
+remDr$navigate(URL)
+
+txt <- remDr$getPageSource()[[1]]
+res <- read_html(txt)
+
+frames = remDr$findElements(using = "id", value = "IframePortlet_8978")
+
+pattern <- "#sub_contents > div.sec.sec_01.on > div:nth-child(1) > table > tbody > tr > td.subject > a"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() %>% 
+  str_trim()
+
+pattern <- "#sub_contents > div.sec.sec_01.on > div:nth-child(1) > table > tbody > tr > td:nth-child(6)"
+date <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() %>% 
+  str_trim()
+
+pub.date <- str_sub(date, 1, 10) %>% str_trim()
+
+pattern <- "#sub_contents > div.sec.sec_01.on > div:nth-child(1) > table > tbody > tr > td.subject > a"
+link <- "https://www.kicpa.or.kr/home/jobOffrSrchGnrl/list.face?ijJobSep=1&ijCoSep=4&listCnt=150&FsrhTab=4"
+
+tab <- cbind(pub.date, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(pub.date, title.link)
+
+names(df) <- c("공고일", "채용공고")
+
+df %>% head(length(title)) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
 ```
 
-### 삼정회계법인 (**`r now`**)
-```{r}
+### 삼일회계법인 채용공고 (**`r now`**) [Link](https://www.pwc.com/kr/ko/career/experienced.html)
 
-
-```
-
-    
-Row {data-height=500}
--------------------------------------
-    
-### Dart 공시 (**Issued at `r now`**)
-
-```{r}
-```
-
-### 삼일회계법인 채용공고 (**`r now`**)
-    
 ```{r}
 
 URL <- "https://www.pwc.com/kr/ko/career/experienced.html"
@@ -411,5 +436,27 @@ df %>% head(20) %>%
   kable(format="html", escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
+system("taskkill /im java.exe /F")
 
 ```
+
+    
+Row {data-height=500}
+-------------------------------------
+< 재미있는 영상>
+
+### TV생물도감 (**Issued at `r now`**)
+
+```{r}
+
+```
+
+### 삼일회계법인 채용공고 (**`r now`**) [Link](https://www.pwc.com/kr/ko/career/experienced.html)
+
+```{r}
+
+
+
+
+```
+
