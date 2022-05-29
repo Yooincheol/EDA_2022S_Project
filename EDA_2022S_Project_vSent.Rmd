@@ -15,7 +15,7 @@ library(knitr)
 library(kableExtra)
 library(RSelenium)
 
-rD <- rsDriver(port=4990L, "firefox")
+rD <- rsDriver(port=4980L, "firefox")
 remDr <- rD$client
 
 ## 날짜 및 시간 설정
@@ -315,38 +315,267 @@ df %>% head(15) %>%
 여의도 맛집 [점심] {data-icon="fa-hashtag"}
 =====================================
 
-Row {data-height=500}
+Row {data-height=300}
 -------------------------------------
 
-### 일반기업 (**`r now`**)
+### 한식 (**`r now`**)
     
 ```{r}
+date.search <- format(Sys.time(), "%Y%m%d")
+URL <- "https://www.mangoplate.com/search/%EC%97%AC%EC%9D%98%EB%8F%84?keyword=%EC%97%AC%EC%9D%98%EB%8F%84&page=1"
 
+
+res <- read_html(URL)
+
+pattern <- ".restaurant-item .title"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() %>% 
+  str_remove("\n") %>% 
+  str_trim()
+
+pattern <- "body > main > article > div.column-wrapper > div > div > section > div.search-list-restaurants-inner-wrap > ul > li > div > figure > figcaption > div > strong"
+star <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() 
+
+
+pattern <- "body > main > article > div.column-wrapper > div > div > section > div.search-list-restaurants-inner-wrap > ul > li > div> figure > figcaption > div > a"
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href") %>% 
+  str_c("https://www.mangoplate.com/", .)
+
+tab <- cbind(star, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(star, title.link)
+
+names(df) <- c("Star", "Headline")
+
+df %>% head(length(title)) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
 ```
 
-### 삼정회계법인 (**`r now`**)
+### 세계음식 (**`r now`**)
 ```{r}
+date.search <- format(Sys.time(), "%Y%m%d")
+URL <- "https://www.mangoplate.com/search/%EC%97%AC%EC%9D%98%EB%8F%84-%EC%84%B8%EA%B3%84%EC%9D%8C%EC%8B%9D"
 
+
+res <- read_html(URL)
+
+pattern <- ".restaurant-item .title"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() %>% 
+  str_remove("\n") %>% 
+  str_trim()
+
+pattern <- "body > main > article > div.column-wrapper > div > div > section > div.search-list-restaurants-inner-wrap > ul > li > div > figure > figcaption > div > strong"
+star <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() 
+
+
+pattern <- "body > main > article > div.column-wrapper > div > div > section > div.search-list-restaurants-inner-wrap > ul > li > div> figure > figcaption > div > a"
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href") %>% 
+  str_c("https://www.mangoplate.com/", .)
+
+tab <- cbind(star, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(star, title.link)
+
+names(df) <- c("Star", "Headline")
+
+df %>% head(length(title)) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
 ```
 
-    
-Row {data-height=500}
+Row {data-height=300}
 -------------------------------------
     
-### Dart 공시 (**Issued at `r now`**)
-
-```{r}
-```
-
-### 삼일회계법인 채용공고 (**`r now`**)
+### IFC (**`r now`**)
     
 ```{r}
+date.search <- format(Sys.time(), "%Y%m%d")
+URL <- "https://www.mangoplate.com/search/%EC%97%AC%EC%9D%98%EB%8F%84%20ifc"
 
 
+res <- read_html(URL)
+
+pattern <- ".restaurant-item .title"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() %>% 
+  str_remove("\n") %>% 
+  str_trim()
+
+pattern <- "body > main > article > div.column-wrapper > div > div > section > div.search-list-restaurants-inner-wrap > ul > li > div > figure > figcaption > div > strong"
+star <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() 
+
+
+pattern <- "body > main > article > div.column-wrapper > div > div > section > div.search-list-restaurants-inner-wrap > ul > li > div> figure > figcaption > div > a"
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href") %>% 
+  str_c("https://www.mangoplate.com/", .)
+
+tab <- cbind(star, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(star, title.link)
+
+names(df) <- c("Star", "Headline")
+
+df %>% head(length(title)) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
 ```
+
+### 카페 (**`r now`**)
+    
+```{r}
+date.search <- format(Sys.time(), "%Y%m%d")
+URL <- "https://www.mangoplate.com/search/%EC%97%AC%EC%9D%98%EB%8F%84-%EC%B9%B4%ED%8E%98"
+
+
+res <- read_html(URL)
+
+pattern <- ".restaurant-item .title"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() %>% 
+  str_remove("\n") %>% 
+  str_trim()
+
+pattern <- "body > main > article > div.column-wrapper > div > div > section > div.search-list-restaurants-inner-wrap > ul > li > div > figure > figcaption > div > strong"
+star <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() 
+
+
+pattern <- "body > main > article > div.column-wrapper > div > div > section > div.search-list-restaurants-inner-wrap > ul > li > div> figure > figcaption > div > a"
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href") %>% 
+  str_c("https://www.mangoplate.com/", .)
+
+tab <- cbind(star, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(star, title.link)
+
+names(df) <- c("Star", "Headline")
+
+df %>% head(length(title)) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+```
+
+Row {data-height=300}
+-------------------------------------
+
+### 양식 (**`r now`**)
+    
+```{r}
+date.search <- format(Sys.time(), "%Y%m%d")
+URL <- "https://www.mangoplate.com/search/%EC%97%AC%EC%9D%98%EB%8F%84-%EC%96%91%EC%8B%9D"
+
+
+res <- read_html(URL)
+
+pattern <- ".restaurant-item .title"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() %>% 
+  str_remove("\n") %>% 
+  str_trim()
+
+pattern <- "body > main > article > div.column-wrapper > div > div > section > div.search-list-restaurants-inner-wrap > ul > li > div > figure > figcaption > div > strong"
+star <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() 
+
+
+pattern <- "body > main > article > div.column-wrapper > div > div > section > div.search-list-restaurants-inner-wrap > ul > li > div> figure > figcaption > div > a"
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href") %>% 
+  str_c("https://www.mangoplate.com/", .)
+
+tab <- cbind(star, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(star, title.link)
+
+names(df) <- c("Star", "Headline")
+
+df %>% head(length(title)) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+```
+
+### 술집 (**`r now`**)
+    
+```{r}
+date.search <- format(Sys.time(), "%Y%m%d")
+URL <- "https://www.mangoplate.com/search/%EC%97%AC%EC%9D%98%EB%8F%84-%EC%88%A0%EC%A7%91"
+
+
+res <- read_html(URL)
+
+pattern <- ".restaurant-item .title"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() %>% 
+  str_remove("\n") %>% 
+  str_trim()
+
+pattern <- "body > main > article > div.column-wrapper > div > div > section > div.search-list-restaurants-inner-wrap > ul > li > div > figure > figcaption > div > strong"
+star <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text() 
+
+
+pattern <- "body > main > article > div.column-wrapper > div > div > section > div.search-list-restaurants-inner-wrap > ul > li > div> figure > figcaption > div > a"
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href") %>% 
+  str_c("https://www.mangoplate.com/", .)
+
+tab <- cbind(star, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(star, title.link)
+
+names(df) <- c("Star", "Headline")
+
+df %>% head(length(title)) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+```
+
+
 
 퇴근후의 삶 [저녁] {data-icon="fa-list"} 
 =====================================
@@ -439,7 +668,7 @@ df %>% head(20) %>%
     
 Row {data-height=500} 
 -------------------------------------
-<쉬는 시간>
+<<쉬는 시간>>
 
 ### 넷플릭스 한국드라마(**Issued at `r now`**) [Link](https://www.netflix.com/kr)
 
@@ -479,7 +708,6 @@ df %>% head(length(title)) %>%
 ### 케이시(Kassy) (**`r now`**) [Link](https://www.vlive.tv/channel/E2539B)
 
 ```{r}
-date.search <- format(Sys.time(), "%Y%m%d")
 
 URL <- "https://www.vlive.tv/channel/E2539B/board/4376"
 remDr$navigate(URL)
@@ -487,17 +715,14 @@ remDr$navigate(URL)
 txt <- remDr$getPageSource()[[1]]
 res <- read_html(txt)
 
-pattern <- "#root > div > div.layout_main--2iozc"
-element <- remDr$findElement(using = "css", pattern)
-element$sendKeysToElement(list(key = "page_down"))
-
-Sys.sleep(2)
+frames = remDr$findElements(using = "id", value = "IframePortlet_8978")
 
 pattern <- "#root > div > div.layout_main--2iozc > div.layout_content--3-hGQ > div.board_container--jTnd3 > ul > li > a > div > div.content_area--24ZuP > div.post_title--3sJDT > strong"
 title <- res %>% 
   html_nodes(pattern) %>% 
   html_text()
 
+Sys.sleep(3)
 
 pattern <- ".upload_time--wtBj9"
 date <- res %>% 
@@ -509,7 +734,7 @@ pattern <- "#root > div > div.layout_main--2iozc > div.layout_content--3-hGQ > d
 link <- res %>% 
   html_nodes(pattern) %>% 
   html_attr("href") %>% 
-  str_c("https://www.vlive.tv/", .)
+  str_c("https://www.vlive.tv", .)
 
 tab <- cbind(date, title, link) %>% as_tibble()
 
