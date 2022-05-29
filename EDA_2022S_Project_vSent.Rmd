@@ -65,7 +65,7 @@ title <- res %>%
   Stack <- rbind(Stack, tab)
   
 
-
+ 
 
 df <- Stack %>%
   mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
@@ -746,7 +746,7 @@ df %>% head(20) %>%
     
 Row {data-height=500} 
 -------------------------------------
-<<쉬는 시간>>
+<<휴식 시간>>
 
 ### 넷플릭스 한국드라마(**Issued at `r now`**) [Link](https://www.netflix.com/kr)
 
