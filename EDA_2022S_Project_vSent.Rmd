@@ -15,7 +15,7 @@ library(knitr)
 library(kableExtra)
 library(RSelenium)
 
-rD <- rsDriver(port=4998L, "firefox")
+rD <- rsDriver(port=4990L, "firefox")
 remDr <- rD$client
 
 ## 날짜 및 시간 설정
@@ -23,7 +23,7 @@ now <- Sys.time()
 today <- format(Sys.time(), "%Y.%m.%d.")
 ```
 
-M&A 주요기사 (아침) {data-icon="fa-list"} 
+M&A 주요기사 [아침] {data-icon="fa-list"} 
 ===================================== 
 
 Column {data-width=500}
@@ -59,7 +59,7 @@ for(i in 1:10){
   
   link <- res %>%
     html_nodes(pattern) %>%
-    html_attr("href")
+    html_attr("src")
   
   tab <- cbind(pub.date, title, link) %>% as_tibble()
   
@@ -180,8 +180,7 @@ date.search <- format(Sys.time(), "%Y%m%d")
 Stack <- NULL
 
 for(i in 1:5){
-  URL <-
-    str_c("https://marketinsight.hankyung.com/freenews?page=", i)
+  URL <- str_c("https://marketinsight.hankyung.com/freenews?page=", i)
   
   res <- read_html(URL)
   pattern <- ".news-tit a"
@@ -313,7 +312,7 @@ df %>% head(15) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
-오늘 점심 뭐먹지{data-icon="fa-hashtag"}
+여의도 맛집 [점심] {data-icon="fa-hashtag"}
 =====================================
 
 Row {data-height=500}
@@ -349,7 +348,7 @@ Row {data-height=500}
 
 ```
 
-채용공고(저녁){data-icon="fa-hashtag"}
+퇴근후의 삶 [저녁] {data-icon="fa-list"} 
 =====================================
 
 Row {data-height=500}
@@ -400,7 +399,7 @@ df %>% head(length(title)) %>%
 
 ```
 
-### 삼일회계법인 채용공고 (**`r now`**) [Link](https://www.pwc.com/kr/ko/career/experienced.html)
+### 삼일회계법인 (**`r now`**) [Link](https://www.pwc.com/kr/ko/career/experienced.html)
 
 ```{r}
 
@@ -435,28 +434,88 @@ names(df) <- c("Service", "Job title")
 df %>% head(20) %>%
   kable(format="html", escape=FALSE) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
-
-system("taskkill /im java.exe /F")
-
 ```
 
     
-Row {data-height=500}
+Row {data-height=500} 
 -------------------------------------
-< 재미있는 영상>
+<쉬는 시간>
 
-### TV생물도감 (**Issued at `r now`**)
-
-```{r}
-
-```
-
-### 삼일회계법인 채용공고 (**`r now`**) [Link](https://www.pwc.com/kr/ko/career/experienced.html)
+### 넷플릭스 한국드라마(**Issued at `r now`**) [Link](https://www.netflix.com/kr)
 
 ```{r}
 
+URL <- "https://www.netflix.com/kr/browse/genre/2638104"
+
+res <- read_html(URL)
+pattern <- ".nm-collections-title-name"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
 
 
 
+source <- "NETFLEX"
+
+
+pattern <- "#appMountPoint > div > div.nm-collections-page > main > section:nth-child(2) > div > ul > li > a"
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href")
+
+tab <- cbind(source, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(source, title.link)
+
+names(df) <- c("Source", "Headline")
+
+df %>% head(length(title)) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 ```
 
+### 케이시(Kassy) (**`r now`**) [Link](https://www.vlive.tv/channel/E2539B)
+
+```{r}
+date.search <- format(Sys.time(), "%Y%m%d")
+
+URL <- "https://www.vlive.tv/channel/E2539B/board/4376"
+remDr$navigate(URL)
+
+txt <- remDr$getPageSource()[[1]]
+res <- read_html(txt)
+
+pattern <- "#root > div > div.layout_main--2iozc > div.layout_content--3-hGQ > div.board_container--jTnd3 > ul > li > a > div > div.content_area--24ZuP > div.post_title--3sJDT > strong"
+title <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+
+pattern <- ".upload_time--wtBj9"
+date <- res %>% 
+  html_nodes(pattern) %>% 
+  html_text()
+
+
+pattern <- "#root > div > div.layout_main--2iozc > div.layout_content--3-hGQ > div.board_container--jTnd3 > ul > li > a"
+link <- res %>% 
+  html_nodes(pattern) %>% 
+  html_attr("href") %>% 
+  str_c("https://www.vlive.tv/", .)
+
+tab <- cbind(date, title, link) %>% as_tibble()
+
+df <- tab %>%
+  mutate(title.link = cell_spec(title, "html", link = link, color="#062872")) %>%
+  select(date, title.link)
+
+names(df) <- c("Date", "Headline")
+
+df %>% head(length(title)) %>%
+  kable(format="html", escape=FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+system("taskkill /im java.exe /F")
+```
