@@ -487,6 +487,12 @@ remDr$navigate(URL)
 txt <- remDr$getPageSource()[[1]]
 res <- read_html(txt)
 
+pattern <- "#root > div > div.layout_main--2iozc"
+element <- remDr$findElement(using = "css", pattern)
+element$sendKeysToElement(list(key = "page_down"))
+
+Sys.sleep(2)
+
 pattern <- "#root > div > div.layout_main--2iozc > div.layout_content--3-hGQ > div.board_container--jTnd3 > ul > li > a > div > div.content_area--24ZuP > div.post_title--3sJDT > strong"
 title <- res %>% 
   html_nodes(pattern) %>% 
