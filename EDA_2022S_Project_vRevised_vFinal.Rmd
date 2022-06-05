@@ -662,7 +662,7 @@ df %>% head(length(title)) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
 
 ```
-
+ 
 
 퇴근후의 삶 [저녁] {data-icon="fa-list"} 
 =====================================
@@ -880,7 +880,7 @@ df %>% head(length(title)) %>%
 
 ```
 
-### 케이시(Kassy) (**`r now`**) [Link](https://www.vlive.tv/channel/E2539B)
+### 케이시(Kassy) VLIVE (**`r now`**) [Link](https://www.vlive.tv/channel/E2539B)
 
 ```{r}
 
